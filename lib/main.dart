@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '2023479004',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -28,9 +28,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 20, 183, 237),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: '2023479004'),
     );
   }
 }
@@ -55,7 +57,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -64,6 +65,23 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter--;
+    });
+  }
+
+  void _resetCounter() {
+    setState(() {
+      _counter = 0;
     });
   }
 
@@ -104,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
+            const Text('Pixel Art sobre una grilla personalizable'),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -115,8 +133,20 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.color_lens_rounded),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+      persistentFooterButtons: <Widget>[
+        FloatingActionButton(
+          onPressed: _decrementCounter,
+          tooltip: 'Decrement',
+          child: const Icon(Icons.brush_rounded),
+        ),
+        FloatingActionButton(
+          onPressed: _resetCounter,
+          tooltip: "Reset",
+          child: const Icon(Icons.delete),
+        ),
+      ],
     );
   }
 }
