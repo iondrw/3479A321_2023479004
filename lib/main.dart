@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+Color _appColor = Colors.amber;
+
 void main() {
   runApp(const MyApp());
 }
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 20, 183, 237),
+          seedColor: _appColor, //const Color.fromARGB(255, 20, 183, 237),
         ),
       ),
       home: const MyHomePage(title: '2023479004'),
@@ -57,6 +59,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -70,11 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _decrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter--;
     });
   }
@@ -82,6 +80,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _resetCounter() {
     setState(() {
       _counter = 0;
+    });
+  }
+
+  void _changeColor() {
+    setState(() {
+      _appColor = const Color.fromARGB(255, 88, 5, 255);
     });
   }
 
@@ -98,7 +102,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
         // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor:
+            _appColor, //Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
@@ -133,20 +138,29 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
-        child: const Icon(Icons.color_lens_rounded),
+        child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-      persistentFooterButtons: <Widget>[
-        FloatingActionButton(
-          onPressed: _decrementCounter,
-          tooltip: 'Decrement',
-          child: const Icon(Icons.brush_rounded),
-        ),
-        FloatingActionButton(
-          onPressed: _resetCounter,
-          tooltip: "Reset",
-          child: const Icon(Icons.delete),
-        ),
-      ],
+      persistentFooterButtons: FloatingButtonsLab2,
     );
+  }
+
+  List<Widget> get FloatingButtonsLab2 {
+    return <Widget>[
+      FloatingActionButton(
+        onPressed: _decrementCounter,
+        tooltip: 'Decrement',
+        child: const Icon(Icons.remove),
+      ),
+      FloatingActionButton(
+        onPressed: _resetCounter,
+        tooltip: 'Reset',
+        child: const Icon(Icons.restore),
+      ),
+      FloatingActionButton(
+        onPressed: _changeColor,
+        tooltip: 'ChangeColor',
+        child: Icon(Icons.brush_rounded),
+      ),
+    ];
   }
 }
