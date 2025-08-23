@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-Color _appColor = Colors.amber;
-
 void main() {
   runApp(const MyApp());
 }
@@ -31,7 +29,7 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(
-          seedColor: _appColor, //const Color.fromARGB(255, 20, 183, 237),
+          seedColor: Colors.amber, //const Color.fromARGB(255, 20, 183, 237),
         ),
       ),
       home: const MyHomePage(title: '2023479004'),
@@ -59,14 +57,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  Color _appColor = Colors.amber;
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
@@ -85,7 +78,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _changeColor() {
     setState(() {
-      _appColor = const Color.fromARGB(255, 88, 5, 255);
+      _appColor = Color.fromARGB(
+        (_appColor.a * 255.0).toInt(),
+        (_appColor.r * 255.0).toInt(),
+        (_appColor.g * 255.0).toInt() + _counter * 10,
+        (_appColor.b * 255.0).toInt() + _counter * 10,
+      );
     });
   }
 
@@ -135,17 +133,17 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
       persistentFooterButtons: FloatingButtonsLab2,
     );
   }
 
   List<Widget> get FloatingButtonsLab2 {
     return <Widget>[
+      FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
       FloatingActionButton(
         onPressed: _decrementCounter,
         tooltip: 'Decrement',
