@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,6 +11,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var logger = Logger();
+    logger.d("Logger is working!");
+
     return MaterialApp(
       title: '2023479004',
       theme: ThemeData(
@@ -27,7 +31,8 @@ class MyApp extends StatelessWidget {
         // restart instead.
         //
         // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
+        // tested with just a hot reload.4
+        fontFamily: 'Cute Notes',
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.amber, //const Color.fromARGB(255, 20, 183, 237),
         ),
@@ -126,6 +131,39 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('Pixel Art sobre una grilla personalizable'),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/Pixel-Art-Hot-Pepper-2-1.webp',
+                    width: 300,
+                    height: 300,
+                  ),
+                  Image.asset(
+                    'assets/Pixel-Art-Pizza-2.webp',
+                    width: 300,
+                    height: 300,
+                  ),
+                  Image.asset(
+                    'assets/Pixel-Art-Watermelon-3.webp',
+                    width: 300,
+                    height: 300,
+                  ),
+                  Image.asset(
+                    'assets/Pixel-Art-Hot-Pepper-2-1.webp',
+                    width: 300,
+                    height: 300,
+                  ),
+                  Image.asset(
+                    'assets/Pixel-Art-Pizza-2.webp',
+                    width: 300,
+                    height: 300,
+                  ),
+                ],
+              ),
+            ),
+
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
