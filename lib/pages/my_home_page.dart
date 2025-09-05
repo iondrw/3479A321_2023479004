@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_lab2/main.dart';
+import 'package:flutter_application_lab2/pages/about.dart';
+import 'package:flutter_application_lab2/pages/list_creation.dart';
+import 'package:flutter_application_lab2/pages/list_art.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -45,50 +47,140 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: _appColor, title: Text(widget.title)),
+      appBar: AppBar(
+        backgroundColor: _appColor,
+        title: Text(widget.title),
+        actions: [
+          TextButton(
+            style: ButtonStyle(
+              elevation: WidgetStatePropertyAll(8),
+              shadowColor: WidgetStatePropertyAll(
+                const Color.fromARGB(255, 175, 64, 30),
+              ),
+              backgroundColor: WidgetStateProperty.all(
+                const Color.fromARGB(255, 255, 224, 100),
+              ),
+            ),
+            //Funcion del botón que permite ir hacia la pagina 'About de la aplicación', utilizando Navigator.push
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(builder: (context) => AboutScreen()),
+              );
+            },
+
+            child: Text('About'),
+          ),
+        ],
+      ),
+
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('Pixel Art sobre una grilla personalizable'),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+        child: Card(
+          clipBehavior: Clip.hardEdge,
+          shadowColor: const Color.fromARGB(255, 170, 108, 15),
+          color: const Color.fromARGB(255, 255, 255, 255),
+          elevation: 8,
+          margin: const EdgeInsets.all(16.0),
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Text(
+                'Pixel Art sobre una grilla personalizable',
+                textAlign: TextAlign.center,
+                textScaler: TextScaler.linear(1.5),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/Pixel-Art-Hot-Pepper-2-1.webp',
+                      width: 300,
+                      height: 300,
+                    ),
+                    Image.asset(
+                      'assets/Pixel-Art-Pizza-2.webp',
+                      width: 300,
+                      height: 300,
+                    ),
+                    Image.asset(
+                      'assets/Pixel-Art-Watermelon-3.webp',
+                      width: 300,
+                      height: 300,
+                    ),
+                    Image.asset(
+                      'assets/Pixel-Art-Hot-Pepper-2-1.webp',
+                      width: 300,
+                      height: 300,
+                    ),
+                    Image.asset(
+                      'assets/Pixel-Art-Pizza-2.webp',
+                      width: 300,
+                      height: 300,
+                    ),
+                  ],
+                ),
+              ),
+
+              Text(
+                '$_counter',
+                textScaler: TextScaler.linear(1.5),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              //botones de crear y compartir, crear dirige al mismo tiempo
+              //a la página list_creation
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 5,
+
                 children: [
-                  Image.asset(
-                    'assets/Pixel-Art-Hot-Pepper-2-1.webp',
-                    width: 300,
-                    height: 300,
+                  //boton para la página create
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => ListCreationScreen(),
+                        ),
+                      );
+                    },
+                    style: ButtonStyle(
+                      elevation: WidgetStatePropertyAll(8),
+                      backgroundColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 255, 224, 100),
+                      ),
+                      shadowColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 177, 92, 18),
+                      ),
+                    ),
+                    child: const Icon(Icons.create_rounded),
                   ),
-                  Image.asset(
-                    'assets/Pixel-Art-Pizza-2.webp',
-                    width: 300,
-                    height: 300,
-                  ),
-                  Image.asset(
-                    'assets/Pixel-Art-Watermelon-3.webp',
-                    width: 300,
-                    height: 300,
-                  ),
-                  Image.asset(
-                    'assets/Pixel-Art-Hot-Pepper-2-1.webp',
-                    width: 300,
-                    height: 300,
-                  ),
-                  Image.asset(
-                    'assets/Pixel-Art-Pizza-2.webp',
-                    width: 300,
-                    height: 300,
+                  ElevatedButton(
+                    //lleva a la art list
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (context) => ListArtScreen(),
+                        ),
+                      );
+                    },
+                    style: ButtonStyle(
+                      elevation: WidgetStatePropertyAll(8),
+                      backgroundColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 255, 224, 100),
+                      ),
+                      shadowColor: WidgetStatePropertyAll(
+                        const Color.fromARGB(255, 177, 92, 18),
+                      ),
+                    ),
+                    child: const Icon(Icons.share_rounded),
                   ),
                 ],
               ),
-            ),
-
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       persistentFooterButtons: FloatingButtonsLab2,
@@ -97,24 +189,56 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Widget> get FloatingButtonsLab2 {
     return <Widget>[
-      FloatingActionButton(
+      ElevatedButton(
         onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        style: ButtonStyle(
+          elevation: WidgetStatePropertyAll(8),
+          backgroundColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 255, 224, 100),
+          ),
+          shadowColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 177, 92, 18),
+          ),
+        ),
         child: const Icon(Icons.add),
       ),
-      FloatingActionButton(
+      ElevatedButton(
         onPressed: _decrementCounter,
-        tooltip: 'Decrement',
+        style: ButtonStyle(
+          elevation: WidgetStatePropertyAll(8),
+          backgroundColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 255, 224, 100),
+          ),
+          shadowColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 177, 92, 18),
+          ),
+        ),
         child: const Icon(Icons.remove),
       ),
-      FloatingActionButton(
+      ElevatedButton(
         onPressed: _resetCounter,
-        tooltip: 'Reset',
+        style: ButtonStyle(
+          elevation: WidgetStatePropertyAll(8),
+          backgroundColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 255, 224, 100),
+          ),
+          shadowColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 177, 92, 18),
+          ),
+        ),
         child: const Icon(Icons.restore),
       ),
-      FloatingActionButton(
+      ElevatedButton(
         onPressed: _changeColor,
-        tooltip: 'ChangeColor',
+        style: ButtonStyle(
+          elevation: WidgetStatePropertyAll(8),
+          backgroundColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 255, 224, 100),
+          ),
+          shadowColor: WidgetStatePropertyAll(
+            const Color.fromARGB(255, 177, 92, 18),
+          ),
+        ),
         child: Icon(Icons.brush_rounded),
       ),
     ];
