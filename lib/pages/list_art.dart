@@ -9,6 +9,8 @@ final List<String> elements = [
 ];
 
 class ListArtScreen extends StatelessWidget {
+  const ListArtScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,9 +24,12 @@ class ListArtScreen extends StatelessWidget {
           itemCount: elements.length,
           itemBuilder: (context, index) {
             return Card(
-              child: ListTile(title: Text(elements[index])),
               shadowColor: Colors.deepPurpleAccent,
               elevation: 5,
+              child: ListTile(
+                leading: Icon(Icons.image),
+                title: Text(elements[index]),
+              ),
             );
           },
         ),
