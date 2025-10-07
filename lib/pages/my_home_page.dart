@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_lab2/pages/about.dart';
 import 'package:flutter_application_lab2/pages/list_creation.dart';
 import 'package:flutter_application_lab2/pages/list_art.dart';
+import 'package:flutter_application_lab2/pages/pixel_art_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -91,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 textAlign: TextAlign.center,
                 textScaler: TextScaler.linear(1.5),
               ),
+
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -180,6 +182,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 0,
+                child: PixelArtScreen(
+                  title: 'Sub-Widget',
+                  incrementCounter: _counter,
+                ),
+              ),
             ],
           ),
         ),
@@ -241,6 +250,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
         child: Icon(Icons.brush_rounded),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PixelArtScreen(
+                title: 'Pixel Art',
+                incrementCounter: _counter,
+              ),
+            ),
+          );
+        },
+        child: Icon(Icons.draw_rounded),
       ),
     ];
   }
