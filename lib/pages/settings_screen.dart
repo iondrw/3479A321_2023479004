@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_lab2/pages/pixel_art_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_lab2/providers/configuration_data.dart';
 
@@ -9,16 +10,30 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedSize;
-  String? _selectedPalette;
-
   final List<String> _sizes = ['16', '18', '20', '24', '32'];
   final List<String> _palettes = ['Retro', 'Pastel', 'Neón', 'Grayscale'];
 
   @override
   Widget build(BuildContext context) {
+    final config = context.watch<ConfigurationData>();
+
+    final String currentSize = config.size.toString();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Configuración')),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(builder: (context) => PixelArtScreen()),
+              );
+            },
+            icon: Icon(Icons.arrow_back_sharp),
+          ),
+        ],
+        title: const Text('Configuración'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -26,7 +41,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// --- Tamaño del pixel art ---
               const Text(
                 'Tamaño del Pixel Art',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -37,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   labelText: 'Seleccionar tamaño',
                   border: OutlineInputBorder(),
                 ),
-                value: _selectedSize,
+                value: _sizes.contains(currentSize) ? currentSize : null,
                 items: _sizes
                     .map(
                       (size) => DropdownMenuItem(
@@ -47,7 +61,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     )
                     .toList(),
                 onChanged: (value) {
-                  setState(() => _selectedSize = value);
                   if (value != null) {
                     context.read<ConfigurationData>().setSize(int.parse(value));
                   }
@@ -59,7 +72,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 30),
 
-              /// --- Paleta de colores ---
               const Text(
                 'Paleta de colores',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -70,7 +82,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   labelText: 'Seleccionar paleta',
                   border: OutlineInputBorder(),
                 ),
-                value: _selectedPalette,
+                value: _palettes.contains(config.palette)
+                    ? config.palette
+                    : null,
                 items: _palettes
                     .map(
                       (palette) => DropdownMenuItem(
@@ -80,7 +94,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     )
                     .toList(),
                 onChanged: (value) {
-                  setState(() => _selectedPalette = value);
                   if (value != null) {
                     context.read<ConfigurationData>().setPalette(value);
                   }
@@ -91,17 +104,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 30),
+              SwitchListTile(
+                title: const Text('Habilitar Reseteo Automático'),
+                subtitle: const Text(
+                  'Guarda si la opción de reseteo está activa al iniciar.',
+                ),
+
+                value: config.isResetEnabled,
+                onChanged: (newValue) {
+                  context.read<ConfigurationData>().setResetEnabled(newValue);
+                },
+              ),
+              const SizedBox(height: 30),
 
               Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Configuración guardada')),
-                      );
-                    }
-                  },
-                  child: const Text('Guardar'),
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Configuración guardada (se guarda automáticamente al cambiar)',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Mostrar números'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Configuración guardada (se guarda automáticamente al cambiar)',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text('Guardar'),
+                    ),
+                  ],
                 ),
               ),
             ],

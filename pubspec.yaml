@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   logger: ^2.6.1
   provider: ^6.1.5+1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,10 @@ flutter:
     - family: Cute Notes
       fonts:
         - asset: assets/fonts/Cute-Notes.ttf
-
+    - family: IM Fell
+      fonts:
+        - asset: assets/fonts/IMFellEnglish-Regular.ttf
+        - asset: assets/fonts/IMFellEnglish-Italic.ttf
+          style: italic
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

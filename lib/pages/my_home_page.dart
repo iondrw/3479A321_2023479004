@@ -182,13 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ],
               ),
-              SizedBox(
-                height: 0,
-                child: PixelArtScreen(
-                  title: 'Sub-Widget',
-                  incrementCounter: _counter,
-                ),
-              ),
+              SizedBox(height: 0, child: PixelArtScreen()),
             ],
           ),
         ),
@@ -255,12 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => PixelArtScreen(
-                title: 'Pixel Art',
-                incrementCounter: _counter,
-              ),
-            ),
+            MaterialPageRoute(builder: (context) => PixelArtScreen()),
           );
         },
         child: Icon(Icons.draw_rounded),

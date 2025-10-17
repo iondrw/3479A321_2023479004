@@ -3,140 +3,257 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_lab2/providers/configuration_data.dart';
 import 'package:flutter_application_lab2/pages/settings_screen.dart';
+import 'package:flutter_application_lab2/services/shared_preferences_service.dart';
 
 class PixelArtScreen extends StatefulWidget {
-  const PixelArtScreen({
-    super.key,
-    required this.title,
-    required this.incrementCounter,
-  });
-
-  final String title;
-  final int incrementCounter;
-
+  const PixelArtScreen({super.key});
   @override
-  State<PixelArtScreen> createState() => _PixelArtScreenState();
+  _PixelArtScreenState createState() => _PixelArtScreenState();
 }
 
 class _PixelArtScreenState extends State<PixelArtScreen> {
-  var logger = Logger();
-  int _sizeGrid = 0;
+  Logger logger = Logger();
+  bool _showNumbers = true;
+  int _sizeGrid = 10;
+  Color _selectedColor = Colors.black;
+  late List<Color> _listColors;
+
+  late List<Color> _cellColors = List<Color>.generate(
+    _sizeGrid * _sizeGrid,
+    (index) => Colors.transparent,
+  );
+
+  final List<Color> _baseColors = [
+    Colors.black,
+    Colors.white,
+    Colors.red,
+    Colors.orange,
+    Colors.yellow,
+    Colors.green,
+    Colors.blue,
+    Colors.indigo,
+    Colors.purple,
+    Colors.brown,
+    Colors.grey,
+    Colors.pink,
+  ];
 
   @override
+  void _toggleNumberVisibility() {
+    setState(() {
+      _showNumbers = !_showNumbers;
+      logger.d("Number visibility toggled to: $_showNumbers");
+    });
+  }
+
   void initState() {
     super.initState();
-    _sizeGrid = context.read<ConfigurationData>().size;
-    logger.d('PixelArtScreen initState - size: $_sizeGrid');
+    logger.d("PixelArtScreen initialized. Mounted: $mounted");
+
+    final configData = context.read<ConfigurationData>();
+    _sizeGrid = configData.size;
+    _selectedColor = configData.paletteColor;
+
+    _listColors = _updateColorList(_selectedColor);
+
+    _cellColors = List<Color>.generate(
+      _sizeGrid * _sizeGrid,
+      (index) => Colors.transparent,
+    );
+
+    logger.d("Grid size set to: $_sizeGrid, initial color: $_selectedColor");
+  }
+
+  List<Color> _updateColorList(Color newPrimaryColor) {
+    List<Color> colors = [newPrimaryColor];
+    for (var color in _baseColors) {
+      if (color != newPrimaryColor) {
+        colors.add(color);
+      }
+    }
+    return colors;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    logger.d('PixelArtScreen didChangeDependencies');
+
+    final configData = context.watch<ConfigurationData>();
+    final newSize = configData.size;
+    final newPaletteColor = configData.paletteColor;
+
+    if (_sizeGrid != newSize) {
+      setState(() {
+        _sizeGrid = newSize;
+        _cellColors = List<Color>.generate(
+          _sizeGrid * _sizeGrid,
+          (index) => Colors.transparent,
+        );
+        logger.d("Grid size updated to: $_sizeGrid");
+      });
+    }
+
+    if (_selectedColor != newPaletteColor) {
+      setState(() {
+        _selectedColor = newPaletteColor;
+        _listColors = _updateColorList(newPaletteColor);
+        logger.d("Palette color updated to: $_selectedColor");
+      });
+    }
+
+    logger.d("Dependencies changed in PixelArtScreen. Mounted: $mounted");
   }
 
   @override
   void didUpdateWidget(covariant PixelArtScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    logger.d('PixelArtScreen didUpdateWidget');
+    logger.d("PixelArtScreen widget updated. Mounted: $mounted");
   }
 
   @override
   void deactivate() {
     super.deactivate();
-    logger.d('PixelArtScreen deactivate');
+    logger.d("PixelArtScreen deactivated. Mounted: $mounted");
   }
 
   @override
   void dispose() {
     super.dispose();
-    logger.d('PixelArtScreen dispose');
+    logger.d("PixelArtScreen disposed. Mounted: $mounted");
   }
 
   @override
   void reassemble() {
     super.reassemble();
-    logger.d('PixelArtScreen reassemble');
+    logger.d("PixelArtScreen reassembled. Mounted: $mounted");
   }
 
   @override
   Widget build(BuildContext context) {
-    final configSize = context.watch<ConfigurationData>().size;
-
-    if (configSize != _sizeGrid) {
-      logger.d(
-        'PixelArtScreen detectó cambio de tamaño: $_sizeGrid → $configSize',
-      );
-      _sizeGrid = configSize;
-    }
-
-    final gridCount = 10;
+    final configData = context.watch<ConfigurationData>();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: Colors.amber,
+        title: const Text('Creation Process'),
+
         actions: [
           IconButton(
+            icon: Icon(_showNumbers ? Icons.visibility_off : Icons.visibility),
+            onPressed: _toggleNumberVisibility,
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
-            tooltip: 'Configuración',
             onPressed: () {
-              Navigator.push(
+              Navigator.of(
                 context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()),
-              );
+              ).push(MaterialPageRoute(builder: (context) => SettingsScreen()));
             },
           ),
         ],
       ),
-      body: Center(
-        child: SizedBox(
-          height: 500,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'PixelArt Screen',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Counter value: ${widget.incrementCounter}',
-                style: const TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 20),
-
-              Container(
-                width: _sizeGrid * gridCount.toDouble(),
-                height: _sizeGrid * gridCount.toDouble(),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black54, width: 2),
-                ),
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: gridCount,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('${configData.size} x ${configData.size}'),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          hintText: 'Enter title',
+                          border: OutlineInputBorder(),
+                        ),
+                        onSubmitted: (value) {
+                          logger.d('Title entered: $value');
+                        },
+                      ),
+                    ),
                   ),
-                  itemCount: gridCount * gridCount,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.all(0.5),
-                      color: Colors.grey[300],
-                      width: _sizeGrid.toDouble(),
-                      height: _sizeGrid.toDouble(),
+                  ElevatedButton(
+                    onPressed: () {
+                      logger.d('Submit button pressed');
+                    },
+                    child: const Text('Submit'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: configData.size,
+                ),
+                itemCount: configData.size * configData.size,
+                itemBuilder: (context, index) {
+                  if (index >= _cellColors.length) return Container();
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _cellColors[index] = _selectedColor;
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.all(1),
+                      color: _cellColors[index],
+                      child: Center(
+                        child: _showNumbers
+                            ? Text(
+                                '$index',
+                                style: TextStyle(
+                                  color: _cellColors[index] == Colors.black
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              )
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              color: Colors.grey[200],
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: _listColors.map((color) {
+                    final bool isSelected = color == _selectedColor;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedColor = color;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.all(isSelected ? 12 : 8),
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(color: Colors.black, width: 2)
+                              : null,
+                        ),
+                        width: isSelected ? 36 : 28,
+                        height: isSelected ? 36 : 28,
+                      ),
                     );
-                  },
+                  }).toList(),
                 ),
               ),
-
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Go Back'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
