@@ -29,11 +29,26 @@ class ListArtScreen extends StatelessWidget {
               child: ListTile(
                 leading: Icon(Icons.image),
                 title: Text(elements[index]),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () => _shareImage(elements[index]),
+                    ),
+                  ],
+                ),
               ),
             );
           },
         ),
       ),
     );
+  }
+
+  void _shareImage(String imagePath) {
+    // Implementar la lógica de compartir la imagen
+    // Por ejemplo, usar el servicio de compartir de Flutter
+    // o un helper local
   }
 }

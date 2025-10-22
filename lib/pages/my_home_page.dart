@@ -1,8 +1,66 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_lab2/pages/about.dart';
 import 'package:flutter_application_lab2/pages/list_creation.dart';
 import 'package:flutter_application_lab2/pages/list_art.dart';
 import 'package:flutter_application_lab2/pages/pixel_art_screen.dart';
+import 'package:flutter_application_lab2/providers/configuration_data.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart'; // agregar import
+import 'package:cross_file/cross_file.dart'; // nuevo import para XFile
+import 'package:flutter/foundation.dart' show kIsWeb; // detectar web
+
+// Nueva función reutilizable que puede ser llamada desde otras pantallas (list_creation).
+Future<void> shareImageWithDialog(BuildContext context, String path, {String? initialText}) async {
+  final TextEditingController ctrl = TextEditingController(text: initialText ?? 'Mi Pixel Art');
+  final String? userText = await showDialog<String>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Mensaje para compartir'),
+        content: TextField(
+          controller: ctrl,
+          decoration: const InputDecoration(labelText: 'Mensaje'),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(null),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ctrl.text.trim().isEmpty ? 'Mi Pixel Art' : ctrl.text.trim()),
+            child: const Text('Compartir'),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (userText == null) return;
+
+  try {
+    if (kIsWeb) {
+      await Share.share(userText);
+      if (Navigator.of(context).mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Compartiendo texto (web): descarga la imagen desde la lista).')));
+      return;
+    }
+
+    final file = File(path);
+    final exists = await file.exists();
+    if (!exists) {
+      if (Navigator.of(context).mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Archivo no encontrado.')));
+      return;
+    }
+
+    final xfile = XFile(path);
+    await Share.shareXFiles([xfile], text: userText);
+    if (Navigator.of(context).mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Compartido correctamente.')));
+  } catch (e) {
+    if (Navigator.of(context).mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al compartir: $e')));
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -45,8 +103,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _shareImage(String path, {String? initialText}) async {
+    // delega en la función pública para poder reutilizarla desde otras pantallas
+    await shareImageWithDialog(context, path, initialText: initialText);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final lastPixelArt = context.watch<ConfigurationData>().getLastCreation;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -92,8 +156,38 @@ class _MyHomePageState extends State<MyHomePage> {
                 textAlign: TextAlign.center,
                 textScaler: TextScaler.linear(1.5),
               ),
+              SizedBox(
+                height: 300,
+                width: 300,
+                child: Card(
+                  elevation: 6,
+                  child: lastPixelArt.isNotEmpty
+                      ? Stack(
+                          children: [
+                            Image.file(
+                              File(lastPixelArt),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(Icons.image_not_supported, size: 80),
+                                );
+                              },
+                            ),
+                            Positioned(
+                              right: 8,
+                              top: 8,
+                              child: IconButton(
+                                icon: Icon(Icons.share),
+                                onPressed: () => _shareImage(lastPixelArt),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Center(child: Text('Crea tu primer Pixel Art!')),
+                ),
+              ),
 
-              SingleChildScrollView(
+              /*SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
@@ -124,8 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-              ),
-
+              ),*/
               Text(
                 '$_counter',
                 textScaler: TextScaler.linear(1.5),
@@ -136,7 +229,6 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 spacing: 5,
-
                 children: [
                   //boton para la página create
                   ElevatedButton(
@@ -187,11 +279,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      persistentFooterButtons: FloatingButtonsLab2,
+      persistentFooterButtons: floatingButtonsLab2,
     );
   }
 
-  List<Widget> get FloatingButtonsLab2 {
+  List<Widget> get floatingButtonsLab2 {
     return <Widget>[
       ElevatedButton(
         onPressed: _incrementCounter,

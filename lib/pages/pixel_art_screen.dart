@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_lab2/providers/configuration_data.dart';
 import 'package:flutter_application_lab2/pages/settings_screen.dart';
 import 'package:flutter_application_lab2/services/shared_preferences_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:ui' as ui;
+import 'dart:io';
 
 class PixelArtScreen extends StatefulWidget {
   const PixelArtScreen({super.key});
@@ -17,7 +20,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
   int _sizeGrid = 10;
   Color _selectedColor = Colors.black;
   late List<Color> _listColors;
-
+  final TextEditingController _titleController = TextEditingController();
   late List<Color> _cellColors = List<Color>.generate(
     _sizeGrid * _sizeGrid,
     (index) => Colors.transparent,
@@ -119,6 +122,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
   @override
   void dispose() {
     super.dispose();
+    _titleController.dispose();
     logger.d("PixelArtScreen disposed. Mounted: $mounted");
   }
 
@@ -126,6 +130,81 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
   void reassemble() {
     super.reassemble();
     logger.d("PixelArtScreen reassembled. Mounted: $mounted");
+  }
+
+  Future<void> _savePixelArt() async {
+    String rawTitle = _titleController.text.trim();
+    String safeTitle = rawTitle.isEmpty
+        ? 'untitled'
+        : rawTitle.replaceAll(RegExp(r'[^\w\s]+'), '').replaceAll(' ', '_');
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(
+      recorder,
+      Rect.fromLTWH(0, 0, _sizeGrid * 20.0, _sizeGrid * 20.0),
+    );
+    for (int row = 0; row < _sizeGrid; row++) {
+      for (int col = 0; col < _sizeGrid; col++) {
+        final color = _cellColors[row * _sizeGrid + col];
+        final paint = Paint()..color = color;
+        final rect = Rect.fromLTWH(col * 20.0, row * 20.0, 20.0, 20.0);
+        canvas.drawRect(rect, paint);
+      }
+    }
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(_sizeGrid * 20, _sizeGrid * 20);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final imageBytes = byteData!.buffer.asUint8List();
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath =
+        '${directory.path}/${safeTitle}_${DateTime.now().millisecondsSinceEpoch}.png';
+    final file = File(filePath);
+    await file.writeAsBytes(imageBytes);
+    logger.d("Pixel art saved to: $filePath");
+
+    context.read<ConfigurationData>().setLastCreation(filePath);
+    context.read<ConfigurationData>().addCreation(filePath);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Pixel art saved to: $filePath')));
+
+    // Aquí se puede añadir la opción de compartir después de guardar
+    _showShareOptions(filePath);
+  }
+
+  void _showShareOptions(String filePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('¿Qué deseas hacer?'),
+          content: Text('La imagen se ha guardado correctamente.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Guardar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Guardar y compartir'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                // Aquí se llamaría a la función de compartir
+                await _shareImage(filePath);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _shareImage(String filePath) async {
+    // Implementar la lógica de compartir la imagen
+    // Esto puede implicar usar un paquete como 'share' o 'share_plus'
+    logger.d("Compartir imagen desde: $filePath");
+    // Ejemplo con 'share_plus':
+    // await Share.shareFiles([filePath], text: 'Mira mi pixel art!');
   }
 
   @override
@@ -169,6 +248,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
                           hintText: 'Enter title',
                           border: OutlineInputBorder(),
                         ),
+                        controller: _titleController,
                         onSubmitted: (value) {
                           logger.d('Title entered: $value');
                         },
@@ -178,6 +258,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
                   ElevatedButton(
                     onPressed: () {
                       logger.d('Submit button pressed');
+                      _savePixelArt();
                     },
                     child: const Text('Submit'),
                   ),

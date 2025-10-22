@@ -5,7 +5,7 @@ import 'package:flutter_application_lab2/services/shared_preferences_service.dar
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
